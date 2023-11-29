@@ -47,8 +47,8 @@ void print_startup_message(time_t tnext, uint16_t interval) {
 }
 
 int main(int argc, char **argv) {
-    time_t tstart;
-    time_t tnow;
+    time_t tstart = time(NULL);
+    time_t tnow = time(NULL);
     time_t tnext;
     uint8_t action;
     uint16_t interval;
@@ -59,21 +59,26 @@ int main(int argc, char **argv) {
         interval = 3600; // default interval: 1 hour
     }
 
-    time(&tstart);
     tnext = tstart + interval;
-
     print_startup_message(tnext, interval);
 
     while (1) {
         sleep(1);
-        time(&tnow);
+        tnow = time(NULL);
 
         if (tnow > tnext) {
             action = notify();
 
             // determine next notification time
-            time(&tnow);
-            tnext = tnow + (action * interval);
+            tnow = time(NULL);
+
+            if (action != 24) {
+                tnext = tnow + (action * interval);
+            } else {
+                // 24 is a special case were we postpone until next midnight, then resume normal interval again
+                time_t seconds_to_midnight = 86400 - (time(NULL) % 86400);
+                tnext = tnow + seconds_to_midnight;
+            }
         }
     }
 
