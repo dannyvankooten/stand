@@ -1,5 +1,5 @@
 stand: stand.c
-	$(CC) -O3 $^ -o $@
+	$(CC) $(CFLAGS) -O2 -Wall -std=gnu11 $^ -o $@
 
 .PHONY: install
 install: stand
@@ -9,3 +9,8 @@ install: stand
 clean:
 	rm stand
 
+.PHONY: release
+release: stand
+	rm -rf dist/
+	mkdir dist
+	tar -czf dist/stand-linux-amd64.tar.gz $^
