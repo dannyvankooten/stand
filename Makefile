@@ -1,5 +1,5 @@
 stand: stand.c
-	$(CC) $(CFLAGS) -O2 -Wall -std=gnu11 $^ -o $@
+	$(CC) $(CFLAGS) -O2 -Wall -Wpedantic -std=c11 -D_GNU_SOURCE $^ -o $@
 
 .PHONY: install
 install: stand

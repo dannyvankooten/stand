@@ -2,11 +2,12 @@
 #include <time.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdint.h>
 
-int parse_int(const char *s) {
-    int n = 0;
-    int i = 0;
-    while (*s >= '0' && *s <= '9' && i < 10) {
+uint8_t parse_int(const char *s) {
+    uint8_t n = 0;
+    uint8_t i = 0;
+    while (*s >= '0' && *s <= '9' && i < 3) {
         n = n * 10 + (*s - '0');
         i++;
         s++;
@@ -15,7 +16,7 @@ int parse_int(const char *s) {
     return n;
 }
 
-int notify() {
+uint8_t notify() {
     // send notification
     FILE *pout = popen("notify-send -u critical --app-name=\"Stand!\" --action=1=\"I'm up!\" \"Stand\" --action=2=\"Ignore for 2 hours\" --action=24=\"Ignore rest of day\" \"It's time to stand up!\"", "r");
     if (pout == NULL) {
@@ -33,15 +34,15 @@ int notify() {
     return parse_int(s);
 }
 
-void print_startup_message(time_t tnext, int interval) {
+void print_startup_message(time_t tnext, uint16_t interval) {
     struct tm *t = localtime(&tnext);
     char s[32] = "";
-    strftime(s, 32, "%l:%M %p", t);
+    strftime(s, 32, "%I:%M %p", t);
 
     // print some info to stdout
-    printf("Stand is now running!\n");
-    printf("-  Interval: %d seconds\n", interval);
-    printf("-  Next reminder: %s\n", s);
+    printf("Stand is now running\n");
+    printf("Interval: %d seconds\n", interval);
+    printf("Next reminder: %s\n", s);
     fflush(stdout);
 }
 
@@ -49,8 +50,8 @@ int main(int argc, char **argv) {
     time_t tstart;
     time_t tnow;
     time_t tnext;
-    int action;
-    int interval;
+    uint8_t action;
+    uint16_t interval;
 
     if (argc > 1) {
         interval = parse_int(argv[1]);
