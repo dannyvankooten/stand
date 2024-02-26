@@ -4,19 +4,19 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-uint8_t parse_int(const char *s) {
-    uint8_t n = 0;
-    uint8_t i = 0;
+static uint8_t parse_uint8(const char *s) {
+    unsigned int n = 0;
+    unsigned int i = 0;
     while (*s >= '0' && *s <= '9' && i < 3) {
-        n = n * 10 + (*s - '0');
+        n = n * 10u + (unsigned int)(*s - '0');
         i++;
         s++;
     }
 
-    return n;
+    return (uint8_t) n;
 }
 
-uint8_t notify() {
+static uint8_t notify() {
     // send notification
     FILE *pout = popen("notify-send -u critical --app-name=\"Stand!\" --action=1=\"I'm up!\" \"Stand\" --action=2=\"Ignore for 2 hours\" --action=24=\"Ignore rest of day\" \"It's time to stand up!\"", "r");
     if (pout == NULL) {
@@ -24,17 +24,19 @@ uint8_t notify() {
     }
 
     // read stdout
-    char s[32] = "";
-    fread(s, 1, 30, pout);
+    char s[8] = {0};
+    unsigned long nread = fread(s, 1, 30, pout);
+    s[nread] = '\0';
+
     int status = pclose(pout);
     if (status != EXIT_SUCCESS) {
         return 1;
     }
 
-    return parse_int(s);
+    return parse_uint8(s);
 }
 
-void print_startup_message(time_t tnext, uint16_t interval) {
+static void print_startup_message(time_t tnext, uint16_t interval) {
     struct tm *t = localtime(&tnext);
     char s[32] = "";
     strftime(s, 32, "%I:%M %p", t);
@@ -54,7 +56,7 @@ int main(int argc, char **argv) {
     uint16_t interval;
 
     if (argc > 1) {
-        interval = parse_int(argv[1]);
+        interval = parse_uint8(argv[1]);
     } else {
         interval = 3600; // default interval: 1 hour
     }
