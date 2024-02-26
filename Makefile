@@ -1,5 +1,9 @@
+CFLAGS_COMMON =  -O2 -Wall -Wextra -Wpedantic -Wconversion -Wundef -Wformat=2 -std=c11 -D_GNU_SOURCE
+CFLAGS_DEBUG += -fsanitize=address,undefined -fstack-protector-strong
+CFLAGS = $(CFLAGS_COMMON) $(CFLAGS_DEBUG)
+
 stand: stand.c
-	$(CC) $(CFLAGS) -O2 -Wall -Wpedantic -std=c11 -D_GNU_SOURCE $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 .PHONY: install
 install: stand
@@ -10,6 +14,7 @@ clean:
 	rm stand
 
 .PHONY: release
+release: CFLAGS=$(CFLAGS_COMMON)
 release: stand
 	rm -rf dist/
 	mkdir dist
