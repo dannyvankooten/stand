@@ -1,0 +1,2 @@
+CompileFlags:
+  Add: [-std=c11, -Wall, -Wextra, -Wundef -Wsign-conversion -Wpedantic, -D_GNU_SOURCE]
